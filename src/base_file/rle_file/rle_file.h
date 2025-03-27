@@ -10,6 +10,7 @@ class RleFile : public BaseFile
 {
   int ost_data_num = 0;
   char ost_data_ch = 0;
+  char *ost_data = nullptr;
 
 public:
 

@@ -559,19 +559,19 @@ int main() {
     }
 
     {
-      std::string str = "aaaaaaaaaa";
+      std::string str = "aaaaaaaaaabbbbbbbbb";
       RleFile w("a.txt", "w");
 
-      w.write(str.c_str(), 10);
+      w.write(str.c_str(), 19);
 
       w.close();
 
       RleFile r("a.txt", "r");
-      char buf1[6] {}, buf2[5] {};
+      char buf1[6] {}, buf2[11] {};
 
       r.read(buf1, 5);
 
-      r.read(buf2, 4);
+      r.read(buf2, 10);
 
       int x = 0;
     }

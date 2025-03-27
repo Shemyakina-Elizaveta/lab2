@@ -35,37 +35,49 @@ int RleFile::read( void *buf, int max_bytes )
   if (!can_read())
     return 0;
 
-  char *raw_data = new char[max_bytes];
+  // char *raw_data = new char[max_bytes];
   char *dst = static_cast<char *>(buf);
   int dst_len = 0;
 
-  while (ost_data_num > 0 && dst_len < max_bytes)
-    dst[dst_len++] = ost_data_ch;
+  // int len = read_raw(raw_data, max_bytes);
+  // 
+  // // TODO: поправить:
+  // // 1. Не переполнять буфер buf
+  // // 2. Не терять данные между вызовами функции
+  // 
+  // for (int i = 0; i < len;)
+  // {
+  //   char ch = raw_data[i++];
+  //   unsigned char num = raw_data[i++];
+  // 
+  //   for (int j = 0; j < num && dst_len < max_bytes; j++)
+  //     dst[dst_len++] = ch;
+  // }
 
-  if (dst_len >= max_bytes)
-    return dst_len;
+  while (dst_len < max_bytes && ost_data_num > 0)
+    dst[dst_len++] = ost_data_ch, ost_data_num--;
 
-  int len = read_raw(raw_data, max_bytes);
 
-  // TODO: поправить:
-  // 1. Не переполнять буфер buf
-  // 2. Не терять данные между вызовами функции
-
-  for (int i = 0; i < len;)
+  char raw_data[2];
+  for (int i = 0; i < max_bytes / 2; i++)
   {
-    char ch = raw_data[i++];
-    unsigned char num = raw_data[i++];
+    int len = read_raw(raw_data, 2);
 
-    for (int j = 0; j < num && dst_len < max_bytes; j++)
+    if (len <= 1)
+      return dst_len;
+
+    char ch = raw_data[0];
+    unsigned char num = raw_data[1];
+    int j;
+    for (j = 0; j < num && dst_len < max_bytes; j++)
       dst[dst_len++] = ch;
 
-    if (dst_len < num)
-      ost_data_num = num - dst_len, ost_data_ch = ch;
+    if (j < num)
+    {
+      ost_data_ch = ch, ost_data_num = num - j;
+      return dst_len;
+    }
   }
-
-
-
-  delete[] raw_data;
 
   return dst_len;
 }
